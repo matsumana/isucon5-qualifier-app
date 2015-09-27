@@ -6,6 +6,7 @@ use utf8;
 use Kossy;
 use DBIx::Sunny;
 use Encode;
+use Digest::SHA;
 
 my $db;
 sub db {
@@ -58,12 +59,18 @@ sub abort_content_not_found {
 sub authenticate {
     my ($email, $password) = @_;
     my $query = <<SQL;
-SELECT id, account_name, nick_name, email
+SELECT id, account_name, nick_name, email, salt, passhash
 FROM users
-WHERE email = ? AND passhash = SHA2(CONCAT(?, salt), 512)
+WHERE email = ?
 SQL
-    my $result = db->select_row($query, $email, $password);
-    if (!$result) {
+    my $result = db->select_row($query, $email);
+    if ($result) {
+        my $sha = Digest::SHA->new(512);
+        my $p = $sha->add($password . $result->{salt})->hexdigest;
+        if ($result->{passhash} ne $p) {
+            abort_authentication_error();
+        }
+    } else {
         abort_authentication_error();
     }
     session()->{user_id} = $result->{id};
