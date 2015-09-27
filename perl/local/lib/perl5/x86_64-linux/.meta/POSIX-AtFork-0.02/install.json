@@ -1,0 +1,1 @@
+{"version":"0.02","target":"POSIX::AtFork","pathname":"G/GF/GFUJI/POSIX-AtFork-0.02.tar.gz","provides":{"POSIX::AtFork":{"version":"0.02","file":"lib/POSIX/AtFork.pm"}},"dist":"POSIX-AtFork-0.02","name":"POSIX::AtFork"}

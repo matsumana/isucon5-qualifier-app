@@ -7,3 +7,6 @@ requires "Plack::Session";
 
 requires "Gazelle", 0.30;
 requires "Digest::SHA";
+
+requires "Plack::Middleware::Session::Simple";
+requires "Cache::Memcached::Fast::Safe";
