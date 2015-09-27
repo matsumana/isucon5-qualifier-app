@@ -31,6 +31,9 @@ sub db {
 }
 
 my ($SELF, $C);
+
+my $users = {};
+
 sub session {
     $C->stash->{session};
 }
@@ -92,7 +95,13 @@ sub current_user {
 
 sub get_user {
     my ($user_id) = @_;
-    my $user = db->select_row('SELECT * FROM users WHERE id = ?', $user_id);
+    my $user = $users->{$user_id};
+    if (!$user) {
+        $user = db->select_row('SELECT * FROM users WHERE id = ?', $user_id);
+        if ($user) {
+            $users->{$user_id} = $user;
+        }
+    }
     abort_content_not_found() if (!$user);
     return $user;
 }
