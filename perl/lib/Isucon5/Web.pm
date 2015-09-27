@@ -188,9 +188,7 @@ get '/' => [qw(set_global authenticated)] => sub {
     my $entries = [];
     for my $entry (@{db->select_all($entries_query, current_user()->{id})}) {
         $entry->{is_private} = ($entry->{private} == 1);
-        my ($title, $content) = split(/\n/, $entry->{body}, 2);
-        $entry->{title} = $title;
-        $entry->{content} = $content;
+        $entry->{content} = $entry->{body};
         push @$entries, $entry;
     }
 
@@ -212,10 +210,8 @@ SQL
     }
 
     my $entries_of_friends = [];
-    for my $entry (@{db->select_all('SELECT * FROM entries ORDER BY created_at DESC LIMIT 1000')}) {
+    for my $entry (@{db->select_all('SELECT id, user_id, title, created_at FROM entries ORDER BY created_at DESC LIMIT 1000')}) {
         next if (!is_friend($entry->{user_id}));
-        my ($title) = split(/\n/, $entry->{body});
-        $entry->{title} = $title;
         my $owner = get_user($entry->{user_id});
         $entry->{account_name} = $owner->{account_name};
         $entry->{nick_name} = $owner->{nick_name};
@@ -294,9 +290,7 @@ get '/profile/:account_name' => [qw(set_global authenticated)] => sub {
     my $entries = [];
     for my $entry (@{db->select_all($query, $owner->{id})}) {
         $entry->{is_private} = ($entry->{private} == 1);
-        my ($title, $content) = split(/\n/, $entry->{body}, 2);
-        $entry->{title} = $title;
-        $entry->{content} = $content;
+        $entry->{content} = $entry->{body};
         push @$entries, $entry;
     }
     mark_footprint($owner->{id});
@@ -354,9 +348,7 @@ get '/diary/entries/:account_name' => [qw(set_global authenticated)] => sub {
     my $entries = [];
     for my $entry (@{db->select_all($query, $owner->{id})}) {
         $entry->{is_private} = ($entry->{private} == 1);
-        my ($title, $content) = split(/\n/, $entry->{body}, 2);
-        $entry->{title} = $title;
-        $entry->{content} = $content;
+        $entry->{content} = $entry->{body};
         $entry->{comment_count} = db->select_one('SELECT COUNT(*) AS c FROM comments WHERE entry_id = ?', $entry->{id});
         push @$entries, $entry;
     }
@@ -374,9 +366,7 @@ get '/diary/entry/:entry_id' => [qw(set_global authenticated)] => sub {
     my $entry_id = $c->args->{entry_id};
     my $entry = db->select_row('SELECT * FROM entries WHERE id = ?', $entry_id);
     abort_content_not_found() if (!$entry);
-    my ($title, $content) = split(/\n/, $entry->{body}, 2);
-    $entry->{title} = $title;
-    $entry->{content} = $content;
+    $entry->{content} = $entry->{body};
     $entry->{is_private} = ($entry->{private} == 1);
     my $owner = get_user($entry->{user_id});
     if ($entry->{is_private} && !permitted($owner->{id})) {
@@ -400,12 +390,11 @@ get '/diary/entry/:entry_id' => [qw(set_global authenticated)] => sub {
 
 post '/diary/entry' => [qw(set_global authenticated)] => sub {
     my ($self, $c) = @_;
-    my $query = 'INSERT INTO entries (user_id, private, body) VALUES (?,?,?)';
-    my $title = $c->req->param('title');
+    my $query = 'INSERT INTO entries (user_id, private, title, body) VALUES (?,?,?,?)';
+    my $title = $c->req->param('title') || "タイトルなし";
     my $content = $c->req->param('content');
     my $private = $c->req->param('private');
-    my $body = ($title || "タイトルなし") . "\n" . $content;
-    db->query($query, current_user()->{id}, ($private ? '1' : '0'), $body);
+    db->query($query, current_user()->{id}, ($private ? '1' : '0'), $title, $content);
     redirect('/diary/entries/'.current_user()->{account_name});
 };
 
