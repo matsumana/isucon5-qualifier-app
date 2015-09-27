@@ -4,8 +4,8 @@ Description:  Package names found in cpanfile.snapshot
 Columns:      package name, version, path
 Intended-For: Automated fetch routines, namespace documentation.
 Written-By:   Carton v1.0.22
-Line-Count:   532
-Last-Updated: Sun Sep 27 12:55:33 2015
+Line-Count:   550
+Last-Updated: Sun Sep 27 14:21:49 2015
 
 Apache::LogFormat::Compiler        0.13  K/KA/KAZEBURO/Apache-LogFormat-Compiler-0.13.tar.gz
 Bundle::DBD::mysql                4.004  C/CA/CAPTTOFU/DBD-mysql-4.024.tar.gz
@@ -165,6 +165,8 @@ Digest::HMAC_MD5                   1.01  G/GA/GAAS/Digest-HMAC-1.03.tar.gz
 Digest::HMAC_SHA1                  1.03  G/GA/GAAS/Digest-HMAC-1.03.tar.gz
 Digest::SHA1                       2.13  G/GA/GAAS/Digest-SHA1-2.13.tar.gz
 Encode::Locale                     1.03  G/GA/GAAS/Encode-Locale-1.03.tar.gz
+Exporter::Shiny                   0.042  T/TO/TOBYINK/Exporter-Tiny-0.042.tar.gz
+Exporter::Tiny                    0.042  T/TO/TOBYINK/Exporter-Tiny-0.042.tar.gz
 ExtUtils::Config                  0.007  L/LE/LEONT/ExtUtils-Config-0.007.tar.gz
 ExtUtils::Helpers                 0.021  L/LE/LEONT/ExtUtils-Helpers-0.021.tar.gz
 ExtUtils::Helpers::Unix           0.021  L/LE/LEONT/ExtUtils-Helpers-0.021.tar.gz
@@ -176,6 +178,8 @@ File::Copy::Recursive              0.38  D/DM/DMUEY/File-Copy-Recursive-0.38.tar
 File::ShareDir                     1.03  A/AD/ADAMK/File-ShareDir-1.03.tar.gz
 File::ShareDir::Install            0.05  G/GW/GWYN/File-ShareDir-Install-0.05.tar.gz
 Filesys::Notify::Simple            0.12  M/MI/MIYAGAWA/Filesys-Notify-Simple-0.12.tar.gz
+Gazelle                            0.30  K/KA/KAZEBURO/Gazelle-0.30.tar.gz
+Guard                             1.023  M/ML/MLEHMANN/Guard-1.023.tar.gz
 Hash::MultiValue                   0.15  M/MI/MIYAGAWA/Hash-MultiValue-0.15.tar.gz
 HTML::Entities                     3.69  G/GA/GAAS/HTML-Parser-3.71.tar.gz
 HTML::FillInForm::Lite             1.13  G/GF/GFUJI/HTML-FillInForm-Lite-1.13.tar.gz
@@ -217,6 +221,7 @@ HTTP::Server::PSGI                undef  M/MI/MIYAGAWA/Plack-1.0029.tar.gz
 HTTP::Server::PSGI::Net::Server::PreFork undef  M/MI/MIYAGAWA/Starman-0.4008.tar.gz
 HTTP::Status                       6.03  G/GA/GAAS/HTTP-Message-6.06.tar.gz
 IO::HTML                           1.00  C/CJ/CJM/IO-HTML-1.00.tar.gz
+IPC::Signal                        1.00  R/RO/ROSCH/IPC-Signal-1.00.tar.gz
 JSON                               2.59  M/MA/MAKAMAKA/JSON-2.59.tar.gz
 JSON::Backend::PP                  2.59  M/MA/MAKAMAKA/JSON-2.59.tar.gz
 JSON::backportPP::Boolean       2.27202  M/MA/MAKAMAKA/JSON-2.59.tar.gz
@@ -228,6 +233,9 @@ Kossy::Request                     0.38  K/KA/KAZEBURO/Kossy-0.38.tar.gz
 Kossy::Response                    0.38  K/KA/KAZEBURO/Kossy-0.38.tar.gz
 Kossy::Validator                   0.01  K/KA/KAZEBURO/Kossy-Validator-0.01.tar.gz
 Kossy::Validator::Result          undef  K/KA/KAZEBURO/Kossy-Validator-0.01.tar.gz
+List::MoreUtils                   0.413  R/RE/REHSACK/List-MoreUtils-0.413.tar.gz
+List::MoreUtils::PP               0.413  R/RE/REHSACK/List-MoreUtils-0.413.tar.gz
+List::MoreUtils::XS               0.413  R/RE/REHSACK/List-MoreUtils-0.413.tar.gz
 LWP::MediaTypes                    6.02  G/GA/GAAS/LWP-MediaTypes-6.02.tar.gz
 Module::Build                    0.4214  L/LE/LEONT/Module-Build-0.4214.tar.gz
 Module::Build::Base              0.4214  L/LE/LEONT/Module-Build-0.4214.tar.gz
@@ -303,6 +311,9 @@ Net::Server::Single               undef  R/RH/RHANDOM/Net-Server-2.007.tar.gz
 Net::Server::TiedHandle           2.007  R/RH/RHANDOM/Net-Server-2.007.tar.gz
 Number::Format                     1.73  W/WR/WRW/Number-Format-1.73.tar.gz
 ouse                              undef  S/SY/SYOHEX/Mouse-v2.4.5.tar.gz
+Parallel::Prefork                  0.17  K/KA/KAZUHO/Parallel-Prefork-0.17.tar.gz
+Parallel::Prefork::SpareWorkers   undef  K/KA/KAZUHO/Parallel-Prefork-0.17.tar.gz
+Parallel::Prefork::SpareWorkers::Scoreboard undef  K/KA/KAZUHO/Parallel-Prefork-0.17.tar.gz
 Plack                            1.0029  M/MI/MIYAGAWA/Plack-1.0029.tar.gz
 Plack::App::Cascade               undef  M/MI/MIYAGAWA/Plack-1.0029.tar.gz
 Plack::App::CGIBin                undef  M/MI/MIYAGAWA/Plack-1.0029.tar.gz
@@ -320,6 +331,7 @@ Plack::Handler::Apache2::Registry undef  M/MI/MIYAGAWA/Plack-1.0029.tar.gz
 Plack::Handler::CGI               undef  M/MI/MIYAGAWA/Plack-1.0029.tar.gz
 Plack::Handler::CGI::Writer       undef  M/MI/MIYAGAWA/Plack-1.0029.tar.gz
 Plack::Handler::FCGI              undef  M/MI/MIYAGAWA/Plack-1.0029.tar.gz
+Plack::Handler::Gazelle            0.30  K/KA/KAZEBURO/Gazelle-0.30.tar.gz
 Plack::Handler::HTTP::Server::PSGI undef  M/MI/MIYAGAWA/Plack-1.0029.tar.gz
 Plack::Handler::Standalone        undef  M/MI/MIYAGAWA/Plack-1.0029.tar.gz
 Plack::Handler::Starman           undef  M/MI/MIYAGAWA/Starman-0.4008.tar.gz
@@ -387,9 +399,15 @@ Plack::Util                       undef  M/MI/MIYAGAWA/Plack-1.0029.tar.gz
 Plack::Util::Accessor             undef  M/MI/MIYAGAWA/Plack-1.0029.tar.gz
 Plack::Util::IOWithPath           undef  M/MI/MIYAGAWA/Plack-1.0029.tar.gz
 Plack::Util::Prototype            undef  M/MI/MIYAGAWA/Plack-1.0029.tar.gz
+Proc::Wait3                        0.04  C/CT/CTILMES/Proc-Wait3-0.04.tar.gz
 Router::Boom                       1.02  T/TO/TOKUHIROM/Router-Boom-1.02.tar.gz
 Router::Boom::Method               1.02  T/TO/TOKUHIROM/Router-Boom-1.02.tar.gz
 Router::Boom::Node                undef  T/TO/TOKUHIROM/Router-Boom-1.02.tar.gz
+Scope::Guard                       0.21  C/CH/CHOCOLATE/Scope-Guard-0.21.tar.gz
+Server::Starter                    0.32  K/KA/KAZUHO/Server-Starter-0.32.tar.gz
+Server::Starter::Guard            undef  K/KA/KAZUHO/Server-Starter-0.32.tar.gz
+Signal::Mask                      0.008  L/LE/LEONT/Signal-Mask-0.008.tar.gz
+Signal::Pending                   0.008  L/LE/LEONT/Signal-Mask-0.008.tar.gz
 Squirrel                          undef  S/SY/SYOHEX/Mouse-v2.4.5.tar.gz
 Squirrel::Role                    undef  S/SY/SYOHEX/Mouse-v2.4.5.tar.gz
 Starman                          0.4008  M/MI/MIYAGAWA/Starman-0.4008.tar.gz
