@@ -208,16 +208,26 @@ SQL
     my $comments_for_me = [];
     $comments_for_me = \@{db->select_all($comments_for_me_query, session()->{user_id})};
 
+    my $friends_query = 'SELECT u.id, u.account_name, u.nick_name FROM users u INNER JOIN (SELECT one, another, created_at FROM relations WHERE one = ? OR another = ?) r ON u.id = r.another OR u.id = r.one ORDER BY r.created_at DESC';
+    my %friends = ();
+    my $friends = [];
+    for my $rel (@{db->select_all($friends_query, session()->{user_id}, session()->{user_id})}) {
+        next if exists $friends{$rel->{id}};
+        next if $rel->{id} eq session()->{user_id};
+        $friends{delete $rel->{id}} = $rel;
+        push @$friends, $rel;
+    }
+
     my $entries_of_friends = [];
-    for my $entry (@{db->select_all('SELECT u.id, e.title, u.account_name, u.nick_name, e.created_at FROM users u join (SELECT user_id, title, created_at FROM entries ORDER BY created_at DESC LIMIT 1000) e ON u.id = e.user_id ORDER BY e.created_at DESC')}) {
-        next if (!is_friend($entry->{id}));
+    for my $entry (@{db->select_all('SELECT u.id as user_id, e.id, e.title, u.account_name, u.nick_name, e.created_at FROM users u join (SELECT id, user_id, title, created_at FROM entries ORDER BY created_at DESC LIMIT 1000) e ON u.id = e.user_id ORDER BY e.created_at DESC')}) {
+        next unless $friends{$entry->{user_id}};
         push @$entries_of_friends, $entry;
         last if @$entries_of_friends+0 >= 10;
     }
 
     my $comments_of_friends = [];
     for my $comment (@{db->select_all('SELECT * FROM comments ORDER BY created_at DESC LIMIT 1000')}) {
-        next if (!is_friend($comment->{user_id}));
+        next unless $friends{$comment->{user_id}};
         my $entry = db->select_row('SELECT * FROM entries WHERE id = ?', $comment->{entry_id});
         $entry->{is_private} = ($entry->{private} == 1);
         next if ($entry->{is_private} && !permitted($entry->{user_id}));
@@ -232,15 +242,6 @@ SQL
         last if @$comments_of_friends+0 >= 10;
     }
 
-    my $friends_query = 'SELECT u.id, u.account_name, u.nick_name FROM users u INNER JOIN (SELECT one, another, created_at FROM relations WHERE one = ? OR another = ?) r ON u.id = r.another OR u.id = r.one ORDER BY r.created_at DESC';
-    my %friends = ();
-    my $friends = [];
-    for my $rel (@{db->select_all($friends_query, session()->{user_id}, session()->{user_id})}) {
-        next if exists $friends{$rel->{id}};
-        next if $rel->{id} eq session()->{user_id};
-        $friends{delete $rel->{id}} = $rel;
-        push @$friends, $rel;
-    }
 
     my $query = <<SQL;
 SELECT f.user_id AS user_id, f.owner_id AS owner_id, DATE(f.created_at) AS date, MAX(f.created_at) as updated, u.account_name AS account_name, u.nick_name AS nick_name
