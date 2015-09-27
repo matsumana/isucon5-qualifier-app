@@ -241,18 +241,14 @@ SQL
         last if @$comments_of_friends+0 >= 10;
     }
 
-    my $friends_query = 'SELECT * FROM relations WHERE one = ? OR another = ? ORDER BY created_at DESC';
+    my $friends_query = 'SELECT u.id, u.account_name, u.nick_name FROM users u INNER JOIN (SELECT one, another, created_at FROM relations WHERE one = ? OR another = ?) r ON u.id = r.another OR u.id = r.one ORDER BY r.created_at DESC';
     my %friends = ();
     my $friends = [];
-    for my $rel (@{db->select_all($friends_query, current_user()->{id}, current_user()->{id})}) {
-        my $key = ($rel->{one} == current_user()->{id} ? 'another' : 'one');
-        $friends{$rel->{$key}} ||= do {
-            my $friend = get_user($rel->{$key});
-            $rel->{account_name} = $friend->{account_name};
-            $rel->{nick_name} = $friend->{nick_name};
-            push @$friends, $rel;
-            $rel;
-        };
+    for my $rel (@{db->select_all($friends_query, session()->{user_id}, session()->{user_id})}) {
+        next if exists $friends{$rel->{id}};
+        next if $rel->{id} eq session()->{user_id};
+        $friends{delete $rel->{id}} = $rel;
+        push @$friends, $rel;
     }
 
     my $query = <<SQL;
@@ -451,18 +447,15 @@ SQL
 
 get '/friends' => [qw(set_global authenticated)] => sub {
     my ($self, $c) = @_;
-    my $query = 'SELECT * FROM relations WHERE one = ? OR another = ? ORDER BY created_at DESC';
+
+    my $query = 'SELECT u.id, u.account_name, u.nick_name, r.created_at FROM users u INNER JOIN (SELECT one, another, created_at FROM relations WHERE one = ? OR another = ?) r ON u.id = r.another OR u.id = r.one ORDER BY r.created_at DESC';
     my %friends = ();
     my $friends = [];
-    for my $rel (@{db->select_all($query, current_user()->{id}, current_user()->{id})}) {
-        my $key = ($rel->{one} == current_user()->{id} ? 'another' : 'one');
-        $friends{$rel->{$key}} ||= do {
-            my $friend = get_user($rel->{$key});
-            $rel->{account_name} = $friend->{account_name};
-            $rel->{nick_name} = $friend->{nick_name};
-            push @$friends, $rel;
-            $rel;
-        };
+    for my $rel (@{db->select_all($query, session()->{user_id}, session()->{user_id})}) {
+        next if exists $friends{$rel->{id}};
+        next if $rel->{id} eq session()->{user_id};
+        $friends{delete $rel->{id}} = $rel;
+        push @$friends, $rel;
     }
     #my $friends = [ sort { $a->{created_at} lt $b->{created_at} } values(%friends) ];
     $c->render('friends.tx', { friends => $friends });
@@ -474,7 +467,7 @@ post '/friends/:account_name' => [qw(set_global authenticated)] => sub {
     if (!is_friend_account($account_name)) {
         my $user = user_from_account($account_name);
         abort_content_not_found() if (!$user);
-        db->query('INSERT INTO relations (one, another) VALUES (?,?), (?,?)', current_user()->{id}, $user->{id}, $user->{id}, current_user()->{id});
+        db->query('INSERT INTO relations (one, another) VALUES (?,?)', current_user()->{id}, $user->{id});
         redirect('/friends');
     }
 };
