@@ -195,21 +195,16 @@ get '/' => [qw(set_global authenticated)] => sub {
     }
 
     my $comments_for_me_query = <<SQL;
-SELECT c.id AS id, c.entry_id AS entry_id, c.user_id AS user_id, c.comment AS comment, c.created_at AS created_at
+SELECT c.id AS id, c.entry_id AS entry_id, c.user_id AS user_id, c.comment AS comment, c.created_at AS created_at, u.account_name AS account_name, u.nick_name AS nick_name
 FROM comments c
 JOIN entries e ON c.entry_id = e.id
+INNER JOIN users u ON u.id = c.user_id
 WHERE e.user_id = ?
 ORDER BY c.created_at DESC
 LIMIT 10
 SQL
     my $comments_for_me = [];
-    my $comments = [];
-    for my $comment (@{db->select_all($comments_for_me_query, current_user()->{id})}) {
-        my $comment_user = get_user($comment->{user_id});
-        $comment->{account_name} = $comment_user->{account_name};
-        $comment->{nick_name} = $comment_user->{nick_name};
-        push @$comments_for_me, $comment;
-    }
+    $comments_for_me = \@{db->select_all($comments_for_me_query, current_user()->{id})};
 
     my $entries_of_friends = [];
     for my $entry (@{db->select_all('SELECT * FROM entries ORDER BY created_at DESC LIMIT 1000')}) {
@@ -255,20 +250,16 @@ SQL
     }
 
     my $query = <<SQL;
-SELECT user_id, owner_id, DATE(created_at) AS date, MAX(created_at) as updated
-FROM footprints
-WHERE user_id = ?
-GROUP BY user_id, owner_id, DATE(created_at)
+SELECT f.user_id AS user_id, f.owner_id AS owner_id, DATE(f.created_at) AS date, MAX(f.created_at) as updated, u.account_name AS account_name, u.nick_name AS nick_name
+FROM footprints f
+INNER JOIN users u ON f.owner_id = u.id
+WHERE f.user_id = ?
+GROUP BY f.user_id, f.owner_id, DATE(f.created_at)
 ORDER BY updated DESC
 LIMIT 10
 SQL
     my $footprints = [];
-    for my $fp (@{db->select_all($query, current_user()->{id})}) {
-        my $owner = get_user($fp->{owner_id});
-        $fp->{account_name} = $owner->{account_name};
-        $fp->{nick_name} = $owner->{nick_name};
-        push @$footprints, $fp;
-    }
+    $footprints = \@{db->select_all($query, current_user()->{id})};
 
     my $locals = {
         'user' => current_user(),
@@ -431,20 +422,17 @@ post '/diary/comment/:entry_id' => [qw(set_global authenticated)] => sub {
 get '/footprints' => [qw(set_global authenticated)] => sub {
     my ($self, $c) = @_;
     my $query = <<SQL;
-SELECT user_id, owner_id, DATE(created_at) AS date, MAX(created_at) as updated
-FROM footprints
-WHERE user_id = ?
-GROUP BY user_id, owner_id, DATE(created_at)
+SELECT f.user_id, f.owner_id, DATE(f.created_at) AS date, MAX(f.created_at) as updated, u.account_name AS account_name, u.nick_name AS nick_name
+FROM footprints f
+INNER JOIN users u ON f.owner_id = u.id
+WHERE f.user_id = ?
+GROUP BY f.user_id, f.owner_id, DATE(f.created_at)
 ORDER BY updated DESC
 LIMIT 50
 SQL
     my $footprints = [];
-    for my $fp (@{db->select_all($query, current_user()->{id})}) {
-        my $owner = get_user($fp->{owner_id});
-        $fp->{account_name} = $owner->{account_name};
-        $fp->{nick_name} = $owner->{nick_name};
-        push @$footprints, $fp;
-    }
+    $footprints = \@{db->select_all($query, current_user()->{id})};
+
     $c->render('footprints.tx', { footprints => $footprints });
 };
 
