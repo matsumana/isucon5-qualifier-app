@@ -4,12 +4,13 @@ Description:  Package names found in cpanfile.snapshot
 Columns:      package name, version, path
 Intended-For: Automated fetch routines, namespace documentation.
 Written-By:   Carton v1.0.22
-Line-Count:   550
-Last-Updated: Sun Sep 27 14:21:49 2015
+Line-Count:   553
+Last-Updated: Sun Sep 27 16:26:50 2015
 
 Apache::LogFormat::Compiler        0.13  K/KA/KAZEBURO/Apache-LogFormat-Compiler-0.13.tar.gz
 Bundle::DBD::mysql                4.004  C/CA/CAPTTOFU/DBD-mysql-4.024.tar.gz
 Bundle::DBI                    12.008696  T/TI/TIMB/DBI-1.628.tar.gz
+Cache::Memcached::Fast             0.23  K/KR/KROKI/Cache-Memcached-Fast-0.23.tar.gz
 Capture::Tiny                      0.22  D/DA/DAGOLDEN/Capture-Tiny-0.22.tar.gz
 CGI                                4.21  L/LE/LEEJO/CGI-4.21.tar.gz
 CGI::Carp                          4.21  L/LE/LEEJO/CGI-4.21.tar.gz
@@ -370,6 +371,8 @@ Plack::Middleware::ReverseProxy    0.15  M/MI/MIYAGAWA/Plack-Middleware-ReverseP
 Plack::Middleware::Runtime        undef  M/MI/MIYAGAWA/Plack-1.0029.tar.gz
 Plack::Middleware::Session         0.20  M/MI/MIYAGAWA/Plack-Middleware-Session-0.20.tar.gz
 Plack::Middleware::Session::Cookie undef  M/MI/MIYAGAWA/Plack-Middleware-Session-0.20.tar.gz
+Plack::Middleware::Session::Simple 0.03  K/KA/KAZEBURO/Plack-Middleware-Session-Simple-0.03.tar.gz
+Plack::Middleware::Session::Simple::Session undef  K/KA/KAZEBURO/Plack-Middleware-Session-Simple-0.03.tar.gz
 Plack::Middleware::SimpleContentFilter undef  M/MI/MIYAGAWA/Plack-1.0029.tar.gz
 Plack::Middleware::SimpleLogger   undef  M/MI/MIYAGAWA/Plack-1.0029.tar.gz
 Plack::Middleware::StackTrace     undef  M/MI/MIYAGAWA/Plack-1.0029.tar.gz

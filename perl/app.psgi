@@ -4,6 +4,7 @@ use lib "$FindBin::Bin/lib";
 use File::Basename;
 use Plack::Builder;
 use Isucon5::Web;
+use Cache::Memcached::Fast::Safe;
 
 my $root_dir = File::Basename::dirname(__FILE__);
 
@@ -13,9 +14,13 @@ builder {
     enable 'Static',
         path => qr!^/(?:(?:css|fonts|js)/|favicon\.ico$)!,
         root => File::Basename::dirname($root_dir) . '/static';
-    enable 'Session::Cookie',
-        session_key => "isuxi_session",
-        secret => $ENV{ISUCON5_SESSION_SECRET} || 'beermoris',
+    enable 'Session::Simple',
+        store => Cache::Memcached::Fast::Safe->new({
+            servers => [ "localhost:11211" ],
+        }),
+        httponly => 1,
+        cookie_name => "isuxi_session",
+        keep_empty => 0,
     ;
     $app;
 };

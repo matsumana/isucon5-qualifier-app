@@ -209,7 +209,7 @@ SQL
     $comments_for_me = \@{db->select_all($comments_for_me_query, session()->{user_id})};
 
     my $entries_of_friends = [];
-    for my $entry (@{db->select_all('SELECT u.id, e.title, u.account_name, u.nick_name FROM users u join (SELECT user_id, title, created_at FROM entries ORDER BY created_at DESC LIMIT 1000) e ON u.id = e.user_id ORDER BY e.created_at DESC')}) {
+    for my $entry (@{db->select_all('SELECT u.id, e.title, u.account_name, u.nick_name, e.created_at FROM users u join (SELECT user_id, title, created_at FROM entries ORDER BY created_at DESC LIMIT 1000) e ON u.id = e.user_id ORDER BY e.created_at DESC')}) {
         next if (!is_friend($entry->{id}));
         push @$entries_of_friends, $entry;
         last if @$entries_of_friends+0 >= 10;

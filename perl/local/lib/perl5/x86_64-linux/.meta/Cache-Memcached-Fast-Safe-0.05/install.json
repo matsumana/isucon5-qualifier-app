@@ -1,0 +1,1 @@
+{"version":"0.05","target":"Cache::Memcached::Fast::Safe","provides":{"Cache::Memcached::Fast::Safe":{"file":"lib/Cache/Memcached/Fast/Safe.pm","version":"0.05"}},"pathname":"K/KA/KAZEBURO/Cache-Memcached-Fast-Safe-0.05.tar.gz","dist":"Cache-Memcached-Fast-Safe-0.05","name":"Cache::Memcached::Fast::Safe"}
