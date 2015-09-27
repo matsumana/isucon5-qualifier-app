@@ -79,13 +79,10 @@ SQL
 
 sub current_user {
     my ($self, $c) = @_;
-    my $user = stash()->{user};
-
-    return $user if ($user);
 
     return undef if (!session()->{user_id});
 
-    $user = db->select_row('SELECT id, account_name, nick_name, email FROM users WHERE id=?', session()->{user_id});
+    my $user = db->select_row('SELECT id, account_name, nick_name, email FROM users WHERE id=?', session()->{user_id});
     if (!$user) {
         session()->{user_id} = undef;
         abort_authentication_error();
@@ -122,15 +119,15 @@ sub is_friend_account {
 
 sub mark_footprint {
     my ($user_id) = @_;
-    if ($user_id != current_user()->{id}) {
+    if ($user_id != session()->{user_id}) {
         my $query = 'INSERT INTO footprints (user_id,owner_id) VALUES (?,?)';
-        db->query($query, $user_id, current_user()->{id});
+        db->query($query, $user_id, session()->{user_id});
     }
 }
 
 sub permitted {
     my ($another_id) = @_;
-    $another_id == current_user()->{id} || is_friend($another_id);
+    $another_id == session()->{user_id} || is_friend($another_id);
 }
 
 my $PREFS;
@@ -189,11 +186,11 @@ get '/logout' => [qw(set_global)] => sub {
 get '/' => [qw(set_global authenticated)] => sub {
     my ($self, $c) = @_;
 
-    my $profile = db->select_row('SELECT * FROM profiles WHERE user_id = ?', current_user()->{id});
+    my $profile = db->select_row('SELECT * FROM profiles WHERE user_id = ?', session()->{user_id});
 
     my $entries_query = 'SELECT * FROM entries WHERE user_id = ? ORDER BY created_at LIMIT 5';
     my $entries = [];
-    for my $entry (@{db->select_all($entries_query, current_user()->{id})}) {
+    for my $entry (@{db->select_all($entries_query, session()->{user_id})}) {
         $entry->{is_private} = ($entry->{private} == 1);
         $entry->{content} = $entry->{body};
         push @$entries, $entry;
@@ -209,7 +206,7 @@ ORDER BY c.created_at DESC
 LIMIT 10
 SQL
     my $comments_for_me = [];
-    $comments_for_me = \@{db->select_all($comments_for_me_query, current_user()->{id})};
+    $comments_for_me = \@{db->select_all($comments_for_me_query, session()->{user_id})};
 
     my $entries_of_friends = [];
     for my $entry (@{db->select_all('SELECT u.id, e.title, u.account_name, u.nick_name FROM users u join (SELECT user_id, title, created_at FROM entries ORDER BY created_at DESC LIMIT 1000) e ON u.id = e.user_id ORDER BY e.created_at DESC')}) {
@@ -255,7 +252,7 @@ ORDER BY updated DESC
 LIMIT 10
 SQL
     my $footprints = [];
-    $footprints = \@{db->select_all($query, current_user()->{id})};
+    $footprints = \@{db->select_all($query, session()->{user_id})};
 
     my $locals = {
         'user' => current_user(),
@@ -313,19 +310,19 @@ post '/profile/:account_name' => [qw(set_global authenticated)] => sub {
     my $birthday = $c->req->param('birthday');
     my $pref = $c->req->param('pref');
 
-    my $prof = db->select_row('SELECT * FROM profiles WHERE user_id = ?', current_user()->{id});
+    my $prof = db->select_row('SELECT * FROM profiles WHERE user_id = ?', session()->{user_id});
     if ($prof) {
       my $query = <<SQL;
 UPDATE profiles
 SET first_name=?, last_name=?, sex=?, birthday=?, pref=?, updated_at=CURRENT_TIMESTAMP()
 WHERE user_id = ?
 SQL
-        db->query($query, $first_name, $last_name, $sex, $birthday, $pref, current_user()->{id});
+        db->query($query, $first_name, $last_name, $sex, $birthday, $pref, session()->{user_id});
     } else {
         my $query = <<SQL;
 INSERT INTO profiles (user_id,first_name,last_name,sex,birthday,pref) VALUES (?,?,?,?,?,?)
 SQL
-        db->query($query, current_user()->{id}, $first_name, $last_name, $sex, $birthday, $pref);
+        db->query($query, session()->{user_id}, $first_name, $last_name, $sex, $birthday, $pref);
     }
     redirect('/profile/'.$account_name);
 };
@@ -351,7 +348,7 @@ get '/diary/entries/:account_name' => [qw(set_global authenticated)] => sub {
     my $locals = {
         owner => $owner,
         entries => $entries,
-        myself => (current_user()->{id} == $owner->{id}),
+        myself => (session()->{user_id} == $owner->{id}),
     };
     $c->render('entries.tx', $locals);
 };
@@ -389,7 +386,7 @@ post '/diary/entry' => [qw(set_global authenticated)] => sub {
     my $title = $c->req->param('title') || "タイトルなし";
     my $content = $c->req->param('content');
     my $private = $c->req->param('private');
-    db->query($query, current_user()->{id}, ($private ? '1' : '0'), $title, $content);
+    db->query($query, session()->{user_id}, ($private ? '1' : '0'), $title, $content);
     redirect('/diary/entries/'.current_user()->{account_name});
 };
 
@@ -404,7 +401,7 @@ post '/diary/comment/:entry_id' => [qw(set_global authenticated)] => sub {
     }
     my $query = 'INSERT INTO comments (entry_id, user_id, comment) VALUES (?,?,?)';
     my $comment = $c->req->param('comment');
-    db->query($query, $entry->{id}, current_user()->{id}, $comment);
+    db->query($query, $entry->{id}, session()->{user_id}, $comment);
     redirect('/diary/entry/'.$entry->{id});
 };
 
@@ -420,7 +417,7 @@ ORDER BY updated DESC
 LIMIT 50
 SQL
     my $footprints = [];
-    $footprints = \@{db->select_all($query, current_user()->{id})};
+    $footprints = \@{db->select_all($query, session()->{user_id})};
 
     $c->render('footprints.tx', { footprints => $footprints });
 };
@@ -447,7 +444,7 @@ post '/friends/:account_name' => [qw(set_global authenticated)] => sub {
     if (!is_friend_account($account_name)) {
         my $user = user_from_account($account_name);
         abort_content_not_found() if (!$user);
-        db->query('INSERT INTO relations (one, another) VALUES (?,?)', current_user()->{id}, $user->{id});
+        db->query('INSERT INTO relations (one, another) VALUES (?,?)', session()->{user_id}, $user->{id});
         redirect('/friends');
     }
 };
